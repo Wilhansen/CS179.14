@@ -8,15 +8,15 @@ class SceneManager {
 public:
 	
 	class Scene {
-		bool m_active;
+		bool m_active, m_loaded;
 		friend class SceneManager;
-		
+
 		SceneManager *m_manager;
 		
 		virtual void onActivate() {}
 		virtual void onDeactivate(SceneManager &sm) {}
 	public:
-		Scene() : m_active(false), m_manager(0) {}
+		Scene() : m_active(false), m_loaded(false), m_manager(0) {}
 		
 		bool isActive() const { return m_active; };
 		SceneManager* getManager() const { return m_manager; }
@@ -26,6 +26,7 @@ public:
 		
 		virtual void onKeyUp(ci::app::KeyEvent &e) {}
 		virtual void onKeyDown(ci::app::KeyEvent &e) {}
+		virtual void onLoad() {}
 		
 		virtual ~Scene() {}
 	};
@@ -42,6 +43,10 @@ public:
 		m_scenes.push_back(s);
 		s->m_manager = this;
 		s->m_active = true;
+		if ( !s->m_loaded ) {
+			s->onLoad();
+			s->m_loaded = true;
+		}
 		s->onActivate();
 	}
 	
